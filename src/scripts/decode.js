@@ -25,31 +25,54 @@ function randomChar() {
   return BASE64_ALPHABET[Math.floor(Math.random() * BASE64_ALPHABET.length)];
 }
 
+function cursor(char) {
+  const span = document.createElement('span');
+  span.className = 'board-cursor';
+  span.textContent = char;
+  return span;
+}
+
+/**
+ * The two layers every board block has: the real text for assistive
+ * technology, and the layer eyes read.
+ *
+ * Reused when they already exist, so a block that was scrambled first keeps
+ * its noise instead of being blanked and refilled.
+ */
+function layers(el, text) {
+  let announced = el.querySelector(':scope > .visually-hidden');
+  let visual = el.querySelector(':scope > [aria-hidden="true"]');
+
+  if (!announced || !visual) {
+    announced = document.createElement('span');
+    announced.className = 'visually-hidden';
+    visual = document.createElement('span');
+    visual.setAttribute('aria-hidden', 'true');
+    el.replaceChildren(announced, visual);
+  }
+
+  announced.textContent = text;
+  return { announced, visual };
+}
+
 /**
  * The noise a block sits in before it decodes.
  *
  * Without this a reader sees the settled text first and then watches it
- * scramble, which is the effect backwards. The real text is in the DOM from
- * the start for assistive technology either way.
+ * scramble, which is the effect backwards.
  */
 export function scrambleInto(el, text) {
+  const { visual } = layers(el, text);
+
   if (plainWanted()) {
-    el.textContent = text;
+    visual.textContent = text;
     el.dataset.decoded = 'true';
     return;
   }
 
-  const announced = document.createElement('span');
-  announced.className = 'visually-hidden';
-  announced.textContent = text;
-
-  const visual = document.createElement('span');
-  visual.setAttribute('aria-hidden', 'true');
   visual.textContent = Array.from(text)
     .map((char) => (char === '\n' ? '\n' : randomChar()))
     .join('');
-
-  el.replaceChildren(announced, visual);
 }
 
 /**
@@ -57,16 +80,7 @@ export function scrambleInto(el, text) {
  * read position carrying the accent. Resolves when the text is settled.
  */
 export function decodeInto(el, text) {
-  // The text assistive technology reads. Present from the start, never scrambled.
-  const announced = document.createElement('span');
-  announced.className = 'visually-hidden';
-  announced.textContent = text;
-
-  // The layer eyes read.
-  const visual = document.createElement('span');
-  visual.setAttribute('aria-hidden', 'true');
-
-  el.replaceChildren(announced, visual);
+  const { visual } = layers(el, text);
 
   if (plainWanted()) {
     visual.textContent = text;
@@ -78,9 +92,31 @@ export function decodeInto(el, text) {
   const duration = Math.min(MAX_DURATION, Math.max(600, chars.length * 14));
 
   return new Promise((resolve) => {
+    let finished = false;
+
+    const settle = () => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(failsafe);
+      visual.textContent = text;
+      el.dataset.decoded = 'true';
+      resolve();
+    };
+
+    /*
+      A browser suspends requestAnimationFrame in a tab that is not being
+      drawn, so a reader who opens a chapter in a background tab would be left
+      with a block that never fills — the text would simply not be there.
+      setTimeout still runs in that tab, so it settles the text regardless.
+      Whichever lands first wins; the other is cancelled.
+    */
+    const failsafe = setTimeout(settle, duration + 1500);
+
     const start = performance.now();
 
     const step = (now) => {
+      if (finished) return;
+
       const progress = Math.min(1, (now - start) / duration);
       const settled = Math.floor(progress * chars.length);
 
@@ -111,21 +147,12 @@ export function decodeInto(el, text) {
       if (progress < 1) {
         requestAnimationFrame(step);
       } else {
-        visual.textContent = text;
-        el.dataset.decoded = 'true';
-        resolve();
+        settle();
       }
     };
 
     requestAnimationFrame(step);
   });
-}
-
-function cursor(char) {
-  const span = document.createElement('span');
-  span.className = 'board-cursor';
-  span.textContent = char;
-  return span;
 }
 
 /** Run `fn` the first time `el` scrolls into view. */
