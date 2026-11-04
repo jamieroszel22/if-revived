@@ -1,0 +1,60 @@
+---
+import '../styles/global.css';
+import { SITE } from '../lib/site';
+
+interface Props {
+  /** Page title. Chapters use their first line; nothing is invented. */
+  title?: string;
+  /** Says what the site is. Never what the book is about. */
+  description?: string;
+  /** The stem shows the title as plain text rather than a link to itself. */
+  home?: boolean;
+}
+
+const { title, description, home = false } = Astro.props;
+const pageTitle = title ? `${title} — ${SITE.title}` : SITE.title;
+---
+
+<!doctype html>
+<html lang="en" data-plain="false">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    {!SITE.indexable && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- Set before first paint, so the switch does not flash off and on. -->
+    <script is:inline>
+      try {
+        var stored = localStorage.getItem('ifrevived:plain');
+        document.documentElement.dataset.plain =
+          stored === 'true' ? 'true' : 'false';
+      } catch (error) {
+        /* Storage blocked. The switch still works for this page. */
+      }
+    </script>
+  </head>
+
+  <body>
+    <div class="page">
+      <p class="site-title">
+        {home ? SITE.title : <a href="/">{SITE.title}</a>}
+      </p>
+      <slot />
+    </div>
+
+    <footer class="site-foot">
+      <a href="/about/">About</a>
+      <label class="plain-switch">
+        <input type="checkbox" data-plain-switch />
+        Plain text
+      </label>
+    </footer>
+
+    <script>
+      import '../scripts/plain-switch.js';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import NoiseSlot from '../components/NoiseSlot.astro';
+import { releasedChapters, nextSlotIndex, positionLabel } from '../lib/chapters';
+
+/*
+  The stem. The title, the released chapters in reading order by their first
+  line, then one slot of noise. Nothing else: no count, no progress, no list
+  of what is coming.
+*/
+const chapters = await releasedChapters();
+const next = await nextSlotIndex();
+---
+
+<Base home>
+  <nav aria-label="Chapters">
+    <ol class="stem">
+      {
+        chapters.map((entry) => (
+          <li>
+            <a href={`/read/${positionLabel(entry.data.position)}/`}>
+              <span class="stem-index">{positionLabel(entry.data.position)}</span>
+              <span class="stem-line">{entry.data.firstLine}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+
+  <NoiseSlot index={next} />
+</Base>

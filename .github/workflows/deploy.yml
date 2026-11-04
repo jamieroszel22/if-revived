@@ -1,0 +1,53 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  # Release is a rebuild. A daily build puts a chapter live on its date with
+  # nobody touching anything.
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      # npm run build runs the unreleased-text check and fails the job if any
+      # unreleased chapter made it into dist/.
+      - run: npm run build
+
+      - name: Publish dist/ to the deploy branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          rm -rf .deploy
+          mkdir .deploy
+          cp -R dist/. .deploy/
+          cd .deploy
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -q -b deploy
+          git add -A
+          git commit -q -m "Build ${GITHUB_SHA:0:7}"
+          git push -q --force \
+            "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            deploy

@@ -1,0 +1,25 @@
+---
+import { noise, positionLabel } from '../lib/chapters';
+
+interface Props {
+  index: number;
+}
+
+const { index } = Astro.props;
+
+/*
+  The next slot, and only the next one. An index, never a total. No target
+  address and no timestamp: a header would give away where this one goes.
+
+  The noise is drawn at build time from the base64 alphabet. It is not the
+  chapter encrypted — that would commit to text that is still allowed to
+  change — and its length says nothing about the real length.
+*/
+const string = noise();
+---
+
+<div class="noise-slot">
+  <span class="noise-index" aria-hidden="true">{positionLabel(index)}</span>
+  <span class="noise-string" aria-hidden="true">{string}</span>
+  <span class="visually-hidden">Position {positionLabel(index)} is not readable yet.</span>
+</div>

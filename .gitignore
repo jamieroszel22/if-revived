@@ -1,0 +1,24 @@
+# Build output
+dist/
+.astro/
+
+# Dependencies
+node_modules/
+
+# Private material. Per the site plan: the canon register, state doc, log and
+# drafts never go in this repo. The register holds the ending.
+/canon/
+/drafts/
+/log/
+pdoom-canon.md
+pdoom-agreement.md
+
+# Keys. The site's private signing key never goes in the repo.
+*.pem
+*.key
+site-key.json
+.env
+.env.*
+
+# OS
+.DS_Store

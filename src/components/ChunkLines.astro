@@ -1,0 +1,66 @@
+---
+import type { Chapter } from '../lib/chapters';
+
+interface Props {
+  entry: Chapter;
+}
+
+const { entry } = Astro.props;
+const { lines } = entry.data;
+---
+
+<div class="chunk">
+  {
+    lines.map((line, i) => {
+      const rawId = `raw-${entry.id}-${i}`;
+
+      return (
+        <div class="chunk-line">
+          <div class="chunk-header">
+            <span class="chunk-os">{line.os}</span>
+            <span>{line.from}</span>
+            <span aria-hidden="true">to</span>
+            <span>{line.to}</span>
+            <span class="chunk-verb">{line.verb}</span>
+          </div>
+
+          <div class="chunk-body">{line.body}</div>
+
+          {line.raw &&
+            (line.rawByDefault ? (
+              /* One line per chunk shows its string without being asked. */
+              <div class="chunk-raw">
+                <span
+                  class="chunk-raw-string"
+                  id={rawId}
+                  data-raw-string={line.raw}
+                  data-raw-default
+                >
+                  {line.raw}
+                </span>
+              </div>
+            ) : (
+              /*
+                A details element, so the string is reachable with no
+                JavaScript at all. The decode is the enhancement, not the way in.
+              */
+              <details class="chunk-raw" data-raw-details>
+                <summary>raw</summary>
+                <span
+                  class="chunk-raw-string"
+                  id={rawId}
+                  data-raw-string={line.raw}
+                >
+                  {line.raw}
+                </span>
+              </details>
+            ))}
+        </div>
+      );
+    })
+  }
+</div>
+
+<script>
+  import '../scripts/chunk-raw.js';
+</script>

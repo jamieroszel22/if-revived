@@ -1,0 +1,79 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ChunkLines from '../../components/ChunkLines.astro';
+import VerifyDrawer from '../../components/VerifyDrawer.astro';
+import { releasedChapters, positionLabel, type Chapter } from '../../lib/chapters';
+
+interface Props {
+  entry: Chapter;
+  previous?: Chapter;
+  next?: Chapter;
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const chapters = await releasedChapters();
+
+  return chapters.map((entry, i) => ({
+    params: { slug: positionLabel(entry.data.position) },
+    props: {
+      entry,
+      previous: chapters[i - 1],
+      next: chapters[i + 1],
+    },
+  }));
+};
+
+const { entry, previous, next } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<Base title={entry.data.firstLine}>
+  {
+    entry.data.placeholder && (
+      <p class="placeholder-note">
+        Placeholder text. This stands in for the chapter so the site can be
+        built and read through; it is not the book.
+      </p>
+    )
+  }
+
+  <article>
+    {
+      entry.data.surface === 'chunk' ? (
+        <ChunkLines entry={entry} />
+      ) : (
+        <div class="prose">
+          <Content />
+        </div>
+      )
+    }
+
+    <!-- The hook that nothing fills. It is a line, not a feature. -->
+    <p class="hook" aria-hidden="true"></p>
+  </article>
+
+  <VerifyDrawer entry={entry} />
+
+  <nav class="chapter-nav" aria-label="Reading order">
+    {previous ? (
+      <a href={`/read/${positionLabel(previous.data.position)}/`} rel="prev">
+        Previous
+      </a>
+    ) : (
+      <span />
+    )}
+    {next ? (
+      <a href={`/read/${positionLabel(next.data.position)}/`} rel="next">
+        Next
+      </a>
+    ) : (
+      <span />
+    )}
+  </nav>
+
+  <script>
+    import '../../scripts/board-text.js';
+  </script>
+</Base>

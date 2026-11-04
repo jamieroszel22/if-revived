@@ -1,0 +1,115 @@
+---
+import { SITE } from '../lib/site';
+import { passageSource, type Chapter } from '../lib/chapters';
+
+interface Props {
+  entry: Chapter;
+}
+
+const { entry } = Astro.props;
+const { authorship, signature, versions, processNote, release } = entry.data;
+
+const source = passageSource(entry);
+const currentVersion =
+  versions.length > 0 ? Math.max(...versions.map((v) => v.version)) : 1;
+const releaseDate = release === 'draft' ? '' : release.toISOString().slice(0, 10);
+
+const fmt = (date: Date) => date.toISOString().slice(0, 10);
+---
+
+<!--
+  Verify is a drawer on the passage, never a page, and always opt-in. Nothing
+  on the site requires it.
+-->
+<details
+  class="verify"
+  data-verify
+  data-authorship={authorship}
+  data-version={String(currentVersion)}
+  data-date={releaseDate}
+  data-signature={signature ?? ''}
+  data-public-key={SITE.publicKey}
+>
+  <summary>Verify</summary>
+
+  <div class="verify-body">
+    <div class="verify-row">
+      <span class="verify-key">Written by</span>
+      <span class="verify-value">{authorship}</span>
+    </div>
+
+    <div class="verify-row">
+      <span class="verify-key">Version</span>
+      <span class="verify-value">{currentVersion}</span>
+    </div>
+
+    {
+      releaseDate && (
+        <div class="verify-row">
+          <span class="verify-key">Date</span>
+          <span class="verify-value">{releaseDate}</span>
+        </div>
+      )
+    }
+
+    <div class="verify-row">
+      <span class="verify-key">Signature</span>
+      <span class="verify-value is-string">
+        {signature ?? 'Not signed yet.'}
+      </span>
+    </div>
+
+    {
+      versions.length > 0 && (
+        <div class="verify-row">
+          <span class="verify-key">Earlier versions</span>
+          <ul class="verify-versions verify-value">
+            {versions
+              .slice()
+              .sort((a, b) => b.version - a.version)
+              .map((v) => (
+                <li>
+                  <span>
+                    {v.version} · {fmt(v.date)}
+                  </span>
+                  {v.note && <div class="verify-key">{v.note}</div>}
+                  {v.signature && (
+                    <div class="verify-key is-string">{v.signature}</div>
+                  )}
+                </li>
+              ))}
+          </ul>
+        </div>
+      )
+    }
+
+    {
+      processNote && (
+        <div class="verify-row">
+          <span class="verify-key">Process note</span>
+          <p class="verify-note verify-value">{processNote}</p>
+        </div>
+      )
+    }
+
+    <div class="verify-row">
+      <span class="verify-key">Check</span>
+      <span class="verify-value">
+        <button type="button" data-verify-run>Check signature</button>
+        <span class="verify-key" data-verify-result role="status"></span>
+      </span>
+    </div>
+
+    <p class="verify-scope">
+      A signature proves this text and this label have not changed since Jamie
+      signed them. It cannot prove who typed the words.
+    </p>
+
+    <!-- The exact text the signature covers, for the check to hash. -->
+    <script type="text/plain" data-passage-source set:text={source} />
+  </div>
+</details>
+
+<script>
+  import '../scripts/verify.js';
+</script>
