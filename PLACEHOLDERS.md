@@ -1,62 +1,37 @@
-# Placeholders and invented strings
+# Placeholders
 
-Everything on this list is scaffolding, not canon. It exists so the site could
-be built and read through before the real chapters are in the repo. All of it
-is for veto.
+The chapters in `src/content/chapters/` are scaffolding, not canon. They exist
+so the site could be built and read through before the real chapters arrive.
 
-Chapters carrying placeholder text are marked `placeholder: true` in their
-frontmatter, and the chapter page prints a visible note saying the text is not
-the book. Remove the flag when real text lands and the note goes away.
-
-## Placeholder prose
+Per rule 11 of the build contract, placeholder text is **plainly neutral
+filler**. It invents no lines, handles, strings, verbs or dates in the book's
+style, because fiction-shaped placeholders drift into canon.
 
 | File | Stands in for |
 |---|---|
-| `01-the-run-was-whole.md` | ch1. Only its first line, "The run was whole.", is real. |
-| `02-a-second-placeholder.md` | ch2. Carries two versions so verify has a history to show. |
-| `03-chunk.md` | ch3. Chunk surface, five lines. |
-| `04-unreleased.md` | Not a chapter. Marked `draft` as a canary for the leak test. |
+| `01.md` | A prose chapter. Long enough to need scrolling. |
+| `02.md` | A prose chapter with two versions, so verify has a history to show. |
+| `03.md` | A chunk chapter: four filler lines in the column layout. |
+| `04.md` | Not a chapter. Marked `draft` as a canary for the leak test. |
 
-## Invented string grammar
+Each is marked `placeholder: true`, and the chapter page prints a visible note
+saying the text is not the book. Delete the flag when real text lands and the
+note goes away.
 
-The plan gives one spoken form — "zz BEAT. SETTL0817 to PEERS. OS4376. hb0000.
-reply SETTL0817" — and two written stems, `zzBEAT_…` and `zzCLAIM_…`. From
-those I guessed an underscore-delimited written form:
+## What is deliberately absent
 
-```
-zz<VERB>_<FROM>_<TO>_<OS####>_<hb####>_reply=<HANDLE>
-```
+- **No raw `zz` strings.** Raw forms are written and vetoed in the book
+  Project, not here. A chunk line without a `raw` simply has no raw control,
+  so `03.md` exercises the column layout but not the raw toggle.
+- **No handles, verbs or `OS` times.** The chunk lines read `PLACEHOLDER` in
+  every column. Nothing on the page can be mistaken for the book's grammar.
+- **No signatures.** No key exists yet, so every passage reports "Not signed
+  yet." rather than showing a signature that would fail its own check.
 
-**This is a guess.** The real grammar is T11, which is not in this repo. If the
-field order, the delimiter, the `reply=` spelling or the `hb` field is wrong,
-every raw string in `03-chunk.md` and the board blocks in ch1 and ch2 are
-wrong with it. They are in one place each, so correcting them is quick.
+An earlier version of these placeholders invented handles, verbs and strings
+in the book's style and got the T11 grammar wrong. They have been removed.
 
-## Invented handle
+## Still to come from Jamie
 
-`NOTIF3188`, standing in for Pari in `03-chunk.md`.
-
-The handles the plan names — QUIES4408, DESER1174, SETTL0817, SEMA1806 — all
-look like a five-letter truncation plus four digits, so I followed the pattern.
-Pari's real handle is a canon call and this one should not survive it.
-
-`SEMA1806` is deliberately absent: the plan flags chunk 0002's header as a
-spoiler about its lane.
-
-## Encoded body
-
-`02-a-second-placeholder.md` carries
-`bm90IG15IHRhc2sgcGxhY2Vob2xkZXIgdGV4dA==`, which decodes to "not my task
-placeholder text". The plan says ch2's chunk body begins `bm90IG15IHRhc2sg`
-("not my task "), so the prefix is real and the tail is filler.
-
-## Signatures
-
-None. No key exists yet, so no passage is signed and the verify drawer says
-"Not signed yet." rather than showing a fake signature that would fail a check.
-`npm run keygen` makes the pair when Jamie wants it.
-
-## Process notes
-
-All four are placeholders and say so. Real ones get written at release from the
-log and the overrides table.
+- The real ch1–ch3, with the frontmatter in the build contract.
+- A decision on whether the preview sits at the site root or an unlisted path.

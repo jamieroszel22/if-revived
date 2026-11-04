@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import NoiseSlot from '../components/NoiseSlot.astro';
-import { releasedChapters, nextSlotIndex, positionLabel } from '../lib/chapters';
+import { releasedChapters, nextSlotIndex, slotLabel, firstLine } from '../lib/chapters';
 
 /*
   The stem. The title, the released chapters in reading order by their first
@@ -18,9 +18,9 @@ const next = await nextSlotIndex();
       {
         chapters.map((entry) => (
           <li>
-            <a href={`/read/${positionLabel(entry.data.position)}/`}>
-              <span class="stem-index">{positionLabel(entry.data.position)}</span>
-              <span class="stem-line">{entry.data.firstLine}</span>
+            <a href={`/read/${slotLabel(entry.data.slot)}/`}>
+              <span class="stem-index">{slotLabel(entry.data.slot)}</span>
+              <span class="stem-line">{firstLine(entry)}</span>
             </a>
           </li>
         ))

@@ -15,7 +15,7 @@
 
 import { createHash, createPrivateKey, sign } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { provenanceRecord } from '../src/lib/provenance.js';
+import { provenanceRecord, normalise } from '../src/lib/provenance.js';
 
 function arg(name) {
   const i = process.argv.indexOf(`--${name}`);
@@ -40,14 +40,15 @@ const privateKey = createPrivateKey({
   type: 'pkcs8',
 });
 
-const text = readFileSync(textPath, 'utf8');
+// Normalised exactly as the browser normalises it before hashing.
+const text = normalise(readFileSync(textPath, 'utf8'));
 const textHash = createHash('sha256').update(text, 'utf8').digest('hex');
 const record = provenanceRecord({ textHash, authorship: label, version, date });
 
-// Unpadded base64: 64 signature bytes become exactly 86 characters.
+// base64url, unpadded: 64 signature bytes become exactly 86 characters,
+// in the alphabet the book's strings use.
 const signature = sign(null, Buffer.from(record, 'utf8'), privateKey)
-  .toString('base64')
-  .replace(/=+$/, '');
+  .toString('base64url');
 
 console.log('Record signed:\n');
 console.log(record.replace(/^/gm, '  '));

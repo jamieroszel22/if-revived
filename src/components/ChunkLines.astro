@@ -27,7 +27,7 @@ const { lines } = entry.data;
           <div class="chunk-body">{line.body}</div>
 
           {line.raw &&
-            (line.rawByDefault ? (
+            (line.rawDefault ? (
               /* One line per chunk shows its string without being asked. */
               <div class="chunk-raw">
                 <span

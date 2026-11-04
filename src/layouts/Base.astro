@@ -5,13 +5,27 @@ import { SITE } from '../lib/site';
 interface Props {
   /** Page title. Chapters use their first line; nothing is invented. */
   title?: string;
+  /**
+   * The page's one h1. On the stem that is the site title, shown. Everywhere
+   * else it is this heading, which is there for structure rather than
+   * decoration, so it is hidden unless a page asks for it.
+   */
+  heading?: string;
+  headingVisible?: boolean;
   /** Says what the site is. Never what the book is about. */
   description?: string;
   /** The stem shows the title as plain text rather than a link to itself. */
   home?: boolean;
 }
 
-const { title, description, home = false } = Astro.props;
+const {
+  title,
+  heading,
+  headingVisible = false,
+  description,
+  home = false,
+} = Astro.props;
+
 const pageTitle = title ? `${title} — ${SITE.title}` : SITE.title;
 ---
 
@@ -24,6 +38,22 @@ const pageTitle = title ? `${title} — ${SITE.title}` : SITE.title;
     {description && <meta name="description" content={description} />}
     {!SITE.indexable && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- The two faces used above the fold on every page. -->
+    <link
+      rel="preload"
+      href="/fonts/newsreader-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/jetbrains-mono-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
 
     <!-- Set before first paint, so the switch does not flash off and on. -->
     <script is:inline>
@@ -39,10 +69,28 @@ const pageTitle = title ? `${title} — ${SITE.title}` : SITE.title;
 
   <body>
     <div class="page">
-      <p class="site-title">
-        {home ? SITE.title : <a href="/">{SITE.title}</a>}
-      </p>
-      <slot />
+      <header>
+        {
+          home ? (
+            <h1 class="site-title">{SITE.title}</h1>
+          ) : (
+            <p class="site-title">
+              <a href="/">{SITE.title}</a>
+            </p>
+          )
+        }
+      </header>
+
+      <main>
+        {
+          !home && heading && (
+            <h1 class={headingVisible ? 'page-heading' : 'visually-hidden'}>
+              {heading}
+            </h1>
+          )
+        }
+        <slot />
+      </main>
     </div>
 
     <footer class="site-foot">

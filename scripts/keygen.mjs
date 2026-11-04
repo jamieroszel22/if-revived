@@ -29,7 +29,7 @@ writeFileSync(
       privateKeyPkcs8Base64: privateKey
         .export({ type: 'pkcs8', format: 'der' })
         .toString('base64'),
-      publicKeyRawBase64: rawPublic.toString('base64'),
+      publicKeyRawBase64Url: rawPublic.toString('base64url'),
       created: new Date().toISOString(),
     },
     null,
@@ -40,4 +40,4 @@ writeFileSync(
 
 console.log(`Private key written to ${OUT}. Keep it out of the repo and back it up.\n`);
 console.log('Public key, for src/lib/site.ts and the About page:\n');
-console.log(`  ${rawPublic.toString('base64')}\n`);
+console.log(`  ${rawPublic.toString('base64url')}\n`);

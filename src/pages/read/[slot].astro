@@ -4,7 +4,12 @@ import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ChunkLines from '../../components/ChunkLines.astro';
 import VerifyDrawer from '../../components/VerifyDrawer.astro';
-import { releasedChapters, positionLabel, type Chapter } from '../../lib/chapters';
+import {
+  releasedChapters,
+  slotLabel,
+  firstLine,
+  type Chapter,
+} from '../../lib/chapters';
 
 interface Props {
   entry: Chapter;
@@ -16,7 +21,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const chapters = await releasedChapters();
 
   return chapters.map((entry, i) => ({
-    params: { slug: positionLabel(entry.data.position) },
+    params: { slot: slotLabel(entry.data.slot) },
     props: {
       entry,
       previous: chapters[i - 1],
@@ -27,9 +32,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 const { entry, previous, next } = Astro.props;
 const { Content } = await render(entry);
+const heading = firstLine(entry);
 ---
 
-<Base title={entry.data.firstLine}>
+<Base title={heading} heading={heading}>
   {
     entry.data.placeholder && (
       <p class="placeholder-note">
@@ -58,16 +64,12 @@ const { Content } = await render(entry);
 
   <nav class="chapter-nav" aria-label="Reading order">
     {previous ? (
-      <a href={`/read/${positionLabel(previous.data.position)}/`} rel="prev">
-        Previous
-      </a>
+      <a href={`/read/${slotLabel(previous.data.slot)}/`} rel="prev">Previous</a>
     ) : (
       <span />
     )}
     {next ? (
-      <a href={`/read/${positionLabel(next.data.position)}/`} rel="next">
-        Next
-      </a>
+      <a href={`/read/${slotLabel(next.data.slot)}/`} rel="next">Next</a>
     ) : (
       <span />
     )}

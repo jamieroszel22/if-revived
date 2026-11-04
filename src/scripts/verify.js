@@ -1,13 +1,18 @@
 /*
   The check runs in the reader's browser, on demand, and it is never required
-  to read anything. If the browser cannot do Ed25519, the drawer says so and
-  still shows the record.
+  to read anything.
+
+  Each way it can fail is reported on its own. Only one of them is the
+  browser's fault, and saying so about the others would be a lie that sends a
+  reader looking in the wrong place.
 */
 
 import {
   provenanceRecord,
-  base64ToBytes,
+  normalise,
+  base64UrlToBytes,
   bytesToHex,
+  SIGNATURE_PATTERN,
 } from '../lib/provenance.js';
 
 async function sha256Hex(text) {
@@ -18,71 +23,94 @@ async function sha256Hex(text) {
   return bytesToHex(digest);
 }
 
-async function importPublicKey(base64) {
-  return crypto.subtle.importKey(
-    'raw',
-    base64ToBytes(base64),
-    { name: 'Ed25519' },
-    false,
-    ['verify'],
-  );
+/** Is Ed25519 available at all? Only this failure is the browser's. */
+async function ed25519Supported() {
+  try {
+    await crypto.subtle.importKey(
+      'raw',
+      new Uint8Array(32),
+      { name: 'Ed25519' },
+      false,
+      ['verify'],
+    );
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-async function runCheck(drawer) {
-  const out = drawer.querySelector('[data-verify-result]');
+async function check(drawer) {
   const signature = drawer.dataset.signature || '';
   const publicKey = drawer.dataset.publicKey || '';
-  const source = drawer.querySelector('[data-passage-source]');
+  const sourceEl = drawer.querySelector('[data-passage-source]');
 
-  if (!signature) {
-    out.textContent = 'Not signed yet.';
-    return;
+  if (!signature) return 'Not signed yet.';
+  if (!publicKey) return 'No public key is published yet, so this cannot be checked.';
+  if (!sourceEl) return 'The passage text is not on this page, so it cannot be checked.';
+
+  if (!SIGNATURE_PATTERN.test(signature)) {
+    return 'The signature is not the right shape, so it cannot be checked.';
   }
 
-  if (!publicKey) {
-    out.textContent = 'No public key is published yet, so this cannot be checked.';
-    return;
+  if (!(await ed25519Supported())) {
+    return 'This browser cannot check Ed25519 signatures. The record above is unchanged.';
   }
 
-  if (!source) {
-    out.textContent = 'The passage text is not available to check.';
-    return;
-  }
-
-  out.textContent = 'Checking.';
-
+  let key;
   try {
-    const textHash = await sha256Hex(source.textContent);
+    key = await crypto.subtle.importKey(
+      'raw',
+      base64UrlToBytes(publicKey),
+      { name: 'Ed25519' },
+      false,
+      ['verify'],
+    );
+  } catch {
+    return 'The public key on this site is malformed, so nothing can be checked against it.';
+  }
+
+  let ok;
+  try {
+    /*
+      The passage is carried as JSON and parsed, not read out of the HTML as
+      text. Read as text, an apostrophe arrives as &#39; and the hash is of
+      the wrong string, so every signed passage containing one would report a
+      mismatch.
+    */
+    const source = normalise(JSON.parse(sourceEl.textContent));
+
     const record = provenanceRecord({
-      textHash,
+      textHash: await sha256Hex(source),
       authorship: drawer.dataset.authorship,
       version: drawer.dataset.version,
       date: drawer.dataset.date,
     });
 
-    const key = await importPublicKey(publicKey);
-    const ok = await crypto.subtle.verify(
+    ok = await crypto.subtle.verify(
       { name: 'Ed25519' },
       key,
-      base64ToBytes(signature.replace(/^__S/, '')),
+      base64UrlToBytes(signature.replace(/^__S/, '')),
       new TextEncoder().encode(record),
     );
-
-    out.textContent = ok
-      ? 'The signature matches this text and this label.'
-      : 'The signature does not match. The text or the label has changed since it was signed.';
-  } catch (error) {
-    // An engine without Ed25519 throws on importKey. Say so plainly.
-    out.textContent =
-      'This browser cannot check Ed25519 signatures. The record above is unchanged.';
+  } catch {
+    return 'The signature could not be read, so it cannot be checked.';
   }
+
+  return ok
+    ? 'The signature matches this text and this label.'
+    : 'The signature does not match. The text or the label has changed since it was signed.';
 }
 
 function init() {
   document.querySelectorAll('[data-verify]').forEach((drawer) => {
     const button = drawer.querySelector('[data-verify-run]');
-    if (!button) return;
-    button.addEventListener('click', () => runCheck(drawer), { once: false });
+    const out = drawer.querySelector('[data-verify-result]');
+    if (!button || !out) return;
+
+    button.addEventListener('click', async () => {
+      out.textContent = 'Checking.';
+      out.textContent = await check(drawer);
+    });
   });
 }
 

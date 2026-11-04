@@ -7,14 +7,21 @@ interface Props {
 }
 
 const { entry } = Astro.props;
-const { authorship, signature, versions, processNote, release } = entry.data;
+const { authorship, signature, versions, process, release } = entry.data;
 
 const source = passageSource(entry);
-const currentVersion =
-  versions.length > 0 ? Math.max(...versions.map((v) => v.version)) : 1;
+const currentVersion = versions.length > 0 ? versions.length : 1;
 const releaseDate = release === 'draft' ? '' : release.toISOString().slice(0, 10);
-
 const fmt = (date: Date) => date.toISOString().slice(0, 10);
+
+/*
+  The passage travels as JSON and is parsed back, so the browser hashes the
+  text itself. Carried as HTML text an apostrophe would arrive as &#39; and
+  every signed passage containing one would fail its own check.
+
+  `<` is escaped so the payload cannot close this script element early.
+*/
+const sourceJson = JSON.stringify(source).replace(/</g, '\\u003c');
 ---
 
 <!--
@@ -34,7 +41,7 @@ const fmt = (date: Date) => date.toISOString().slice(0, 10);
 
   <div class="verify-body">
     <div class="verify-row">
-      <span class="verify-key">Written by</span>
+      <span class="verify-key">Label</span>
       <span class="verify-value">{authorship}</span>
     </div>
 
@@ -54,25 +61,20 @@ const fmt = (date: Date) => date.toISOString().slice(0, 10);
 
     <div class="verify-row">
       <span class="verify-key">Signature</span>
-      <span class="verify-value is-string">
-        {signature ?? 'Not signed yet.'}
-      </span>
+      <span class="verify-value is-string">{signature ?? 'Not signed yet.'}</span>
     </div>
 
     {
-      versions.length > 0 && (
+      versions.length > 1 && (
         <div class="verify-row">
-          <span class="verify-key">Earlier versions</span>
+          <span class="verify-key">Versions</span>
           <ul class="verify-versions verify-value">
             {versions
               .slice()
-              .sort((a, b) => b.version - a.version)
+              .reverse()
               .map((v) => (
                 <li>
-                  <span>
-                    {v.version} · {fmt(v.date)}
-                  </span>
-                  {v.note && <div class="verify-key">{v.note}</div>}
+                  <span>{fmt(v.date)} · {v.label}</span>
                   {v.signature && (
                     <div class="verify-key is-string">{v.signature}</div>
                   )}
@@ -84,10 +86,10 @@ const fmt = (date: Date) => date.toISOString().slice(0, 10);
     }
 
     {
-      processNote && (
+      process && (
         <div class="verify-row">
           <span class="verify-key">Process note</span>
-          <p class="verify-note verify-value">{processNote}</p>
+          <p class="verify-note verify-value">{process}</p>
         </div>
       )
     }
@@ -105,8 +107,11 @@ const fmt = (date: Date) => date.toISOString().slice(0, 10);
       signed them. It cannot prove who typed the words.
     </p>
 
-    <!-- The exact text the signature covers, for the check to hash. -->
-    <script type="text/plain" data-passage-source set:text={source} />
+    <script
+      type="application/json"
+      data-passage-source
+      set:html={sourceJson}
+    />
   </div>
 </details>
 

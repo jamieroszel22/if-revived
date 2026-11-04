@@ -2,7 +2,7 @@
   Strings inside the prose are board text: monospace blocks that type out once
   when they scroll into view, then sit still.
 
-  In the Markdown a chapter writes them as a fenced block tagged `board`. Until
+  In the Markdown a chapter writes them as a fenced block tagged `zz`. Until
   this script runs they are an ordinary code block, which is already readable —
   the animation is an enhancement, never the only way to the text.
 */
@@ -28,7 +28,7 @@ function upgrade(pre) {
 }
 
 function init() {
-  const blocks = document.querySelectorAll('.prose pre:has(> code.language-board)');
+  const blocks = document.querySelectorAll('.prose pre:has(> code.language-zz)');
 
   if (blocks.length > 0) {
     blocks.forEach(upgrade);
@@ -36,7 +36,7 @@ function init() {
   }
 
   // :has() is widely supported now, but fall back rather than silently skip.
-  document.querySelectorAll('.prose pre > code.language-board').forEach((code) => {
+  document.querySelectorAll('.prose pre > code.language-zz').forEach((code) => {
     upgrade(code.parentElement);
   });
 }
