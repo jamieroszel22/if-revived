@@ -25,22 +25,43 @@ const version = z.object({
   signature: signature.optional(),
 });
 
-/** A line on the board: OS#### SENDER to TARGET VERB, over a plain body. */
-const chunkLine = z.object({
-  os: z.string(),
-  from: z.string(),
-  to: z.string(),
-  verb: z.string(),
-  body: z.string(),
-  /**
-   * The full zz string behind the line. Raw forms are written and vetoed in
-   * the book Project, never invented here, so a line without one simply has
-   * no raw control.
-   */
-  raw: z.string().optional(),
-  /** One line per chunk may show its string without being asked. */
-  rawDefault: z.boolean().default(false),
-});
+/**
+ * A line on the board: OS#### SENDER to TARGET VERB, over a plain body.
+ *
+ * Two lines in a chunk can break that shape, because the manuscript does:
+ * - a raw-only line, where the chunk shows a string with no readable line;
+ * - a bare line, a body with no header, written into the copy and never posted.
+ * The header is all four fields or none.
+ */
+const chunkLine = z
+  .object({
+    os: z.string().optional(),
+    from: z.string().optional(),
+    to: z.string().optional(),
+    verb: z.string().optional(),
+    body: z.string().optional(),
+    /**
+     * The full zz string behind the line. Raw forms are written and vetoed in
+     * the book Project, never invented here, so a line without one simply has
+     * no raw control.
+     */
+    raw: z.string().optional(),
+    /** One line per chunk may show its string without being asked. */
+    rawDefault: z.boolean().default(false),
+  })
+  .refine(
+    (l) => [l.os, l.from, l.to, l.verb].every((f) => f === undefined) ||
+      [l.os, l.from, l.to, l.verb].every((f) => f !== undefined),
+    'A chunk line has a full header (os, from, to, verb) or none.',
+  )
+  .refine(
+    (l) => l.body !== undefined || l.raw !== undefined,
+    'A chunk line needs a body, a raw string, or both.',
+  )
+  .refine(
+    (l) => l.body !== undefined || l.rawDefault,
+    'A raw-only line has nothing else to show, so it must set rawDefault.',
+  );
 
 const chapters = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/chapters' }),

@@ -275,6 +275,14 @@ board-text,
   font-size: 0.8125rem;
 }
 
+/* A string named inside a sentence: board text, but it stays in the line. */
+.prose :not(pre) > code {
+  font-family: var(--mono);
+  font-size: 0.8125em;
+  color: var(--board-ink);
+  overflow-wrap: anywhere;
+}
+
 /* The decode cursor is read position. */
 .board-cursor {
   color: var(--accent);
@@ -321,8 +329,18 @@ board-text,
   overflow-wrap: break-word;
 }
 
+/* A bare line has no header above it. */
+.chunk-body.is-bare {
+  margin-top: 0;
+}
+
 .chunk-raw {
   margin-top: 0.5rem;
+}
+
+/* A raw-only line has nothing above its string. */
+.chunk-line > .chunk-raw:first-child {
+  margin-top: 0;
 }
 
 .chunk-raw > summary {

@@ -16,15 +16,20 @@ const { lines } = entry.data;
 
       return (
         <div class="chunk-line">
-          <div class="chunk-header">
-            <span class="chunk-os">{line.os}</span>
-            <span>{line.from}</span>
-            <span aria-hidden="true">to</span>
-            <span>{line.to}</span>
-            <span class="chunk-verb">{line.verb}</span>
-          </div>
+          {line.os && (
+            <div class="chunk-header">
+              <span class="chunk-os">{line.os}</span>
+              <span>{line.from}</span>
+              <span aria-hidden="true">to</span>
+              <span>{line.to}</span>
+              <span class="chunk-verb">{line.verb}</span>
+            </div>
+          )}
 
-          <div class="chunk-body">{line.body}</div>
+          {line.body !== undefined && (
+            /* One line on purpose: the body is pre-wrap, so spaces here would show. */
+            <div class={line.os ? 'chunk-body' : 'chunk-body is-bare'}>{line.body}</div>
+          )}
 
           {line.raw &&
             (line.rawDefault ? (

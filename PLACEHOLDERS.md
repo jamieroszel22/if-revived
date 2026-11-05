@@ -7,16 +7,16 @@ Per rule 11 of the build contract, placeholder text is **plainly neutral
 filler**. It invents no lines, handles, strings, verbs or dates in the book's
 style, because fiction-shaped placeholders drift into canon.
 
-| File | Stands in for |
+| File | Status |
 |---|---|
-| `01.md` | A prose chapter. Long enough to need scrolling. |
-| `02.md` | A prose chapter with two versions, so verify has a history to show. |
-| `03.md` | A chunk chapter: four filler lines in the column layout. |
+| `01.md` | Real: ch1, Claude draft 1 (2026-10-29). |
+| `02.md` | Real: ch2, Claude draft 1 (2026-10-29). |
+| `03.md` | Real: ch3 (chunk 0001), Claude draft 2 (2026-11-01). Raw forms behind its lines are Proposed (D28 in the book Project) and Jamie's to veto. |
 | `04.md` | Not a chapter. Marked `draft` as a canary for the leak test. |
 
-Each is marked `placeholder: true`, and the chapter page prints a visible note
-saying the text is not the book. Delete the flag when real text lands and the
-note goes away.
+Real chapters carry no `placeholder` flag. A file that still stands in for a
+chapter is marked `placeholder: true`, and the chapter page prints a visible
+note saying the text is not the book.
 
 ## What is deliberately absent
 
@@ -31,7 +31,7 @@ note goes away.
 An earlier version of these placeholders invented handles, verbs and strings
 in the book's style and got the T11 grammar wrong. They have been removed.
 
-## Still to come from Jamie
+## Decided
 
-- The real ch1–ch3, with the frontmatter in the build contract.
-- A decision on whether the preview sits at the site root or an unlisted path.
+- The real ch1–ch3 sit at the site root (Jamie, 2026-11-04), hidden from
+  search engines but readable by anyone with the address.

@@ -39,7 +39,8 @@ export function firstLine(entry: Chapter): string {
   if (entry.data.surface === 'chunk') {
     const line = entry.data.lines[0];
     if (!line) return '';
-    return `${line.os} ${line.from} to ${line.to} ${line.verb}`;
+    if (line.os) return `${line.os} ${line.from} to ${line.to} ${line.verb}`;
+    return line.body ?? line.raw ?? '';
   }
 
   const body = entry.body ?? '';
@@ -71,7 +72,16 @@ export function passageSource(entry: Chapter): string {
   const source =
     entry.data.surface === 'chunk'
       ? entry.data.lines
-          .map((l) => `${l.os} ${l.from} to ${l.to} ${l.verb}\n${l.body}`)
+          .map((l) =>
+            [
+              l.os ? `${l.os} ${l.from} to ${l.to} ${l.verb}` : undefined,
+              l.body,
+              // A raw-only line is signed by its string, since it has no other text.
+              l.body === undefined ? l.raw : undefined,
+            ]
+              .filter((part) => part !== undefined)
+              .join('\n'),
+          )
           .join('\n\n')
       : (entry.body ?? '').trim();
 

@@ -4,14 +4,17 @@
   reachable whether or not this script ever runs.
 */
 
-import { decodeInto, scrambleInto } from './decode.js';
+import { decodeInto, scrambleInto, onceInView } from './decode.js';
 
 function init() {
-  // The lines that show their string from the start.
+  // The lines that show their string from the start. They decode when the
+  // reader reaches them, not on load: a raw line can sit mid-chunk.
   document.querySelectorAll('[data-raw-default]').forEach((target) => {
     const text = target.dataset.rawString || '';
     scrambleInto(target, text);
-    decodeInto(target, text);
+    onceInView(target, () => {
+      decodeInto(target, text);
+    });
   });
 
   // The rest decode the first time they are opened.
