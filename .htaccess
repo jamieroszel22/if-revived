@@ -1,0 +1,22 @@
+# Static hosting for the built site. Astro writes plain directories and
+# index.html files, so almost nothing is needed here.
+
+# Astro builds /404.html, but Apache will not use it unless told.
+ErrorDocument 404 /404.html
+
+# No directory listings. Nothing should be browsable that is not a page.
+Options -Indexes
+
+# Guarded: without mod_headers these directives would fail the whole site.
+<IfModule mod_headers.c>
+  # The build writes a fresh noise string every time, so the contents page
+  # must not be held in a cache.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+
+  # Fonts and styles are fingerprinted or stable, so they can be held.
+  <FilesMatch "\.(woff2|css|js|svg)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
