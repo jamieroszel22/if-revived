@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="en" data-plain="false"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>About — If Revived</title><meta name="description" content="A novel released in installments, written by Jamie Roszel and Claude."><meta name="robots" content="noindex, nofollow"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><!-- The two faces used above the fold on every page. --><link rel="preload" href="/fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin><!-- Set before first paint, so the switch does not flash off and on. --><script>
+      try {
+        var stored = localStorage.getItem('ifrevived:plain');
+        document.documentElement.dataset.plain =
+          stored === 'true' ? 'true' : 'false';
+      } catch (error) {
+        /* Storage blocked. The switch still works for this page. */
+      }
+    </script><link rel="stylesheet" href="/_astro/about.DtPW8F7z.css"></head> <body> <div class="page"> <header> <p class="site-title"> <a href="/">If Revived</a> </p> </header> <main> <h1 class="page-heading"> About </h1>  <div class="prose"> <p> <em>If Revived</em> is a novel written in the open by Jamie Roszel and
+      Claude, an AI assistant made by Anthropic. It is released in installments.
+      When a chapter is ready, it appears here.
+</p> <p>
+Published chapters can be revised. Nothing on this site is final, so every
+      passage keeps a visible record of what it is and when it changed. The
+      record sits under <strong>Verify</strong> at the foot of each chapter, and
+      reading it is always optional.
+</p> <h2>How the labels work</h2> <p>Each passage carries one of four labels.</p> <ul> <li><strong>Claude draft</strong> — Claude wrote it and Jamie let it stand.</li> <li><strong>Jamie revision</strong> — Claude drafted it and Jamie rewrote it.</li> <li><strong>Jamie original</strong> — Jamie wrote it.</li> <li><strong>Joint</strong> — neither of us can claim the sentences apart.</li> </ul> <h2>What a signature proves</h2> <p>
+A signed record covers a hash of the passage, its label, its version and
+      its date. Checking it proves that the text and the label have not changed
+      since Jamie signed them. The check runs in your browser; nothing is sent
+      anywhere.
+</p> <p>
+It cannot prove who typed the words. No signature can. The labels are our
+      account of how a passage was made, and the signature only fixes that
+      account in place so it cannot be quietly altered later.
+</p> <h2>The public key</h2> <p>
+Not published yet. Until it is, the verify drawer reports passages as
+          unsigned rather than implying a check it cannot run.
+</p> <h2>Process notes</h2> <p>
+Each installment carries a note on how it was made: who wrote what, what
+      changed, and where we disagreed. The notes are inside Verify, with the
+      rest of the record.
+</p> </div>  </main> </div> <footer class="site-foot"> <a href="/about/">About</a> <label class="plain-switch"> <input type="checkbox" data-plain-switch>
+Plain text
+</label> </footer> <script type="module">const a="ifrevived:plain";function n(){const e=document.querySelector("[data-plain-switch]");e&&(e.checked=document.documentElement.dataset.plain==="true",e.addEventListener("change",()=>{const t=e.checked;document.documentElement.dataset.plain=t?"true":"false";try{localStorage.setItem(a,t?"true":"false")}catch{}}))}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",n,{once:!0}):n();</script> </body> </html>

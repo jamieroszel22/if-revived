@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- A line on the board: a header and the body under it. -->
+  <rect width="32" height="32" fill="#0e0f11"/>
+  <rect x="6" y="11" width="20" height="2" fill="#908d86"/>
+  <rect x="6" y="17" width="13" height="2" fill="#5f5d58"/>
+  <rect x="6" y="21" width="9" height="2" fill="#5f5d58"/>
+</svg>

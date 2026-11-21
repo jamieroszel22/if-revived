@@ -1,0 +1,11 @@
+<!DOCTYPE html><html lang="en" data-plain="false"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Not found — If Revived</title><meta name="robots" content="noindex, nofollow"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><!-- The two faces used above the fold on every page. --><link rel="preload" href="/fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin><!-- Set before first paint, so the switch does not flash off and on. --><script>
+      try {
+        var stored = localStorage.getItem('ifrevived:plain');
+        document.documentElement.dataset.plain =
+          stored === 'true' ? 'true' : 'false';
+      } catch (error) {
+        /* Storage blocked. The switch still works for this page. */
+      }
+    </script><link rel="stylesheet" href="/_astro/about.DtPW8F7z.css"></head> <body> <div class="page"> <header> <p class="site-title"> <a href="/">If Revived</a> </p> </header> <main> <h1 class="visually-hidden"> Not found </h1>  <div class="prose"> <p>There is nothing at this address.</p> <p><a href="/">Go to the contents</a>.</p> </div>  </main> </div> <footer class="site-foot"> <a href="/about/">About</a> <label class="plain-switch"> <input type="checkbox" data-plain-switch>
+Plain text
+</label> </footer> <script type="module">const a="ifrevived:plain";function n(){const e=document.querySelector("[data-plain-switch]");e&&(e.checked=document.documentElement.dataset.plain==="true",e.addEventListener("change",()=>{const t=e.checked;document.documentElement.dataset.plain=t?"true":"false";try{localStorage.setItem(a,t?"true":"false")}catch{}}))}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",n,{once:!0}):n();</script> </body> </html>
